@@ -81,9 +81,13 @@ List<IMyTerminalBlock> GetBlocksWithName<T>(string name) where T : class, IMyTer
 
 public class RadioPbApi
 {
-	private Func<IMyTerminalBlock, ICollection<string>, int> _getAllBroadcasters;
-	
-    public bool Activate(Sandbox.ModAPI.Ingame.IMyTerminalBlock pbBlock)
+    Func<IMyTerminalBlock, ICollection<MyDetectedEntityInfo>, int> _getAllBroadcasters;
+    Func<IMyTerminalBlock, ICollection<MyTuple<int, string, string, Vector3D, bool, Color>>> _getGpsList;
+    Func<IMyTerminalBlock, string, string, Vector3D, Color, bool, bool, MyTuple<int, string, string, Vector3D, bool, Color>> _createGps;
+    Func<IMyTerminalBlock, int, string, string, Vector3D, Color, bool, bool, MyTuple<int, string, string, Vector3D, bool, Color>> _updateGps;
+    Func<IMyTerminalBlock, int, bool> _deleteGps;
+
+    public bool Activate(IMyTerminalBlock pbBlock)
     {
         var dict = pbBlock.GetProperty("RadioPbAPI")?.As<IReadOnlyDictionary<string, Delegate>>().GetValue(pbBlock);
         return ApiAssign(dict);
@@ -93,7 +97,7 @@ public class RadioPbApi
     {
         if (delegates == null) return false;
 
-		AssignMethod(delegates, "GetAllBroadcasters", ref _getAllBroadcasters);
+        AssignMethod(delegates, "GetAllBroadcasters", ref _getAllBroadcasters);
 
         return true;
     }
@@ -113,6 +117,11 @@ public class RadioPbApi
             throw new Exception($"{GetType().Name} :: Delegate {name} is not type {typeof(T)}, instead it's: {del.GetType()}");
     }
 
-	public int GetAllBroadcasters(IMyTerminalBlock antennaBlock, ICollection<string> output) => _getAllBroadcasters?.Invoke(antennaBlock, output) ?? 0;
+    public int GetAllBroadcasters(IMyTerminalBlock antennaBlock, ICollection<MyDetectedEntityInfo> output) => _getAllBroadcasters?.Invoke(antennaBlock, output) ?? 0;
+
+    public ICollection<MyTuple<int, string, string, Vector3D, bool, Color>> GetGpsList(IMyTerminalBlock owner) => _getGpsList.Invoke(owner);
+    public MyTuple<int, string, string, Vector3D, bool, Color> CreateGps(IMyTerminalBlock owner, string name, string description, Vector3D coords, Color color, bool showOnHud = true, bool temporary = false) => _createGps.Invoke(owner, name, description, coords, color, showOnHud, temporary);
+    public MyTuple<int, string, string, Vector3D, bool, Color> UpdateGps(IMyTerminalBlock owner, int hash, string name, string description, Vector3D coords, Color color, bool showOnHud = true, bool temporary = false) => _updateGps.Invoke(owner, hash, name, description, coords, color, showOnHud, temporary);
+    public bool DeleteGps(IMyTerminalBlock owner, int hash) => _deleteGps.Invoke(owner, hash);
 }
 ```
