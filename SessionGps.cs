@@ -23,7 +23,7 @@ namespace RadioSigs
         protected ICollection<MyGpsAlias> GetGpsList(IMyTerminalBlock owner)
         {
             var playerIdentityId = GetPlayerIdentityFromGrid(owner);
-            MyLog.Default.WriteLine($"TIN.RadioSigSession.GetGpsList: PlayerIdentityId: {playerIdentityId}");
+            //MyLog.Default.WriteLine($"TIN.RadioSigSession.GetGpsList: PlayerIdentityId: {playerIdentityId}");
             //IMyGps
             // Hash:int
             // Name:string
@@ -36,7 +36,7 @@ namespace RadioSigs
 
             //Convert IMyGps to a MyTuple because IMyGps isn't available to PB scripts.
             var gpsList = MyAPIGateway.Session.GPS.GetGpsList(playerIdentityId);
-            MyLog.Default.WriteLine($"TIN.RadioSigSession.GetGpsList: gpsList.Count: {gpsList.Count}");
+            //MyLog.Default.WriteLine($"TIN.RadioSigSession.GetGpsList: gpsList.Count: {gpsList.Count}");
 
             var result = gpsList.Select(ConvertToMyGpsAlias).ToList();
 
